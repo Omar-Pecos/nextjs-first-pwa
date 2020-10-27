@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 import Container from '../components/container';
 import Global from '../components/global';
+import swal from 'sweetalert';
 
 const URL = Global.url;
 
@@ -59,14 +60,13 @@ const New = () =>{
             if (data.status == 'ok'){
     
                 router.push('/');
-    
-                alert('New todo added : ' + data.todo.title);
+                swal("Good job!", '"' + data.todo.title + '" added :)', "success");
                 
             }else{
-                alert(data.error)
+                swal("Error", data.error, "error");
             }
         }else{
-            alert('Por favor, complete los campos obligatorios')
+            swal("Formulario inválido", 'Por favor, complete los campos obligatorios', "warning");
         }
     
     }
