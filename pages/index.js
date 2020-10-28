@@ -1,11 +1,27 @@
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState , useEffect} from 'react';
 import Container from '../components/container';
 import Global from '../components/global';
 import swal from 'sweetalert';
 
 const Index = ({todos}) =>{
+    // register SW manually :)
+    useEffect(() => {
+        if("serviceWorker" in navigator) {
+          window.addEventListener("load", function () {
+           navigator.serviceWorker.register("/sw.js").then(
+              function (registration) {
+                console.log("Service Worker registration successful with scope: ");
+                console.log(registration);
+              },
+              function (err) {
+                console.log("Service Worker registration failed: ", err);
+              }
+            );
+          });
+        }
+      }, [])
 
    const [todoList, todoListModifier] = useState(todos);
 
@@ -90,24 +106,32 @@ const Index = ({todos}) =>{
         }
 
 }
-
-//this function gets called at build time 
-export async function getStaticProps() {
+ 
+Index.getInitialProps = async (ctx) => {
 
     //Call to API 
     const res = await fetch(Global.url + 'todo');
     const { todos } = await res.json()
 
-    //
-    // By returning { props: todos }, the component
-    // will receive `todos` as a prop at build time
+        // getStaticProps --> at build time
+        // getServerSideProps --> each request
+        // getInitialProps --> (not recommended for next >= 9.3) initial load on server, then will run on the client when navigating to a different route via the next/link component or by using next/router.
 
     return {
-        props: {
-            todos
-        },
+       todos : todos
     }
-
 }
+
+/*export async function getServerSideProps(){
+    //Call to API 
+    const res = await fetch(Global.url + 'todo');
+    const { todos } = await res.json()
+
+    return{
+        props : {
+            todos : todos
+        }
+    }
+}*/
 
 export default Index
